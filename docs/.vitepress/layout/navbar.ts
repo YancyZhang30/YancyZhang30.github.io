@@ -19,18 +19,22 @@ export const nav: DefaultTheme.NavItem[] = [
     ]
   },
   {
+    text: '学无止境',
+    items: [
+      {
+        text: 'Linux',
+        link: '/views/linux/'
+      },
+    ]
+  },
+  {
     text: '关于我',
     items: [
       {
-        text: '掘金',
-        link: 'https://juejin.cn/user/3131845139247960/posts'
+        text: 'CSDN',
+        link: 'https://blog.csdn.net/ZHANGYANG_1109'
       },
-      { text: 'Github', link: 'https://github.com/Jacqueline712' },
-      {
-        text: '飞书社区',
-        link: 'https://pzfqk98jn1.feishu.cn/wiki/space/7193915595975491587?ccm_open_type=lark_wiki_spaceLink'
-      }
-
+      { text: 'Github', link: 'https://github.com/yancyzhang30' },
       // { text: '公众号', link: 'https://blog.csdn.net/weixin_44803753' }
     ]
   }
