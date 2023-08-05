@@ -25,6 +25,10 @@ export const nav: DefaultTheme.NavItem[] = [
         text: 'Linux',
         link: '/views/linux/'
       },
+      {
+        text: 'Nginx',
+        link: '/views/nginx/'
+      },
     ]
   },
   {

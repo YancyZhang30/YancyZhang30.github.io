@@ -1,8 +1,14 @@
 import { DefaultTheme } from 'vitepress'
 import {
-  algorithmSidebarDetail,
+  eassySidebarDetail,
+  toolSidebarDetail,
+  linuxSidebarDetail,
+  nginxSidebarDetail,
 } from './sidebarList'
 
 export const sidebar: DefaultTheme.Sidebar = {
-  ...algorithmSidebarDetail
+  ...eassySidebarDetail,
+  ...toolSidebarDetail,
+  ...linuxSidebarDetail,
+  ...nginxSidebarDetail,
 }
