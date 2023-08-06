@@ -1,337 +1,204 @@
----
-title: 栈在前端中的应用，顺便再了解下深拷贝和浅拷贝！
-author: 周一
-date: '2021-05-17'
-categories:
-  - 前端开发
-tags:
-  - 数构与前端
-sidebar: 'auto'
----
+# vite学习
+## vite为什么比webpack快？
+Vite 通过在一开始将应用中的模块区分为 依赖 和 源码 两类，改进了开发服务器启动时间。
 
-# 前言
+- 依赖：大多为在开发时不会变动的纯 JavaScript。一些较大的依赖（例如有上百个模块的组件库）处理的代价也很高。依赖也通常会存在多种模块化格式（例如 ESM 或者 CommonJS）。
+Vite 将会使用 esbuild 预构建依赖。esbuild 使用 Go 编写，并且比以 JavaScript 编写的打包器预构建依赖快 10-100 倍。
 
-`栈` 在日常生活中的应用非常广泛，比如我们最熟悉不过的十进制转二进制、迷宫求解等等问题。同时，它在前端中的应用也非常广泛，很多小伙伴都会误以为 `栈` 在前端中的应用很少，但殊不知的是，我们写的每一个程序，基本上都会用到 `栈` 这个数据结构。比如，函数调用堆栈、数据的深拷贝和浅拷贝……。
+- 源码：通常包含一些并非直接是 JavaScript 的文件，需要转换（例如 JSX，CSS 或者 Vue/Svelte 组件），时常会被编辑。同时，并不是所有的源码都需要同时被加载（例如基于路由拆分的代码模块）。
 
-所以呢，对于一个前端工程师来说， `栈` 结构是一个必学的知识点。在接下来的这篇文章中，将讲解关于 `栈` 在前端中的应用。
+Vite 以 原生 `ESM 方式`提供源码。这实际上是让浏览器接管了打包程序的部分工作：Vite 只需要在浏览器请求源码时进行转换并按需提供源码。根据情景动态导入代码，即只在当前屏幕上实际使用时才会被处理。
 
-# 一、栈是什么
+vite官网：https://cn.vitejs.dev/
 
-- 栈是一种只能在**表的一端（栈顶）**进行插入和删除运算的**线性表**；
-- 只能在**栈顶**运算，且访问结点时依照**后进先出** (LIFO) 或**先进后出** (FILO) 的原则。
+## vite创建项目
+```bash
+# npm 6.x
+npm create vite@latest my-vue-app --template vue
 
-# 二、栈的应用场景
+# npm 7+, extra double-dash is needed:
+npm create vite@latest my-vue-app -- --template vue
 
-- 需要**后进先出**的场景；
-- 比如：十进制转二进制、迷宫求解、马踏棋盘、判断字符串是否有效、函数调用堆栈……。
+# yarn
+yarn create vite my-vue-app --template vue
 
-# 三、前端与栈：深拷贝与浅拷贝
+# pnpm
+pnpm create vite my-vue-app --template vue
+```
+一般都是：
+```bash
+npm create vite my-vite-app -- --template vue-ts
+```
+## 根目录和index.html
+在一个 Vite 项目中，index.html 在项目最外层而不是在 public 文件夹内。这是有意而为之的：在开发期间 Vite 是一个服务器，而 index.html 是该 Vite 项目的入口文件。
 
-## 1、JS 数据类型
+Vite 将 index.html 视为源码和模块图的一部分。Vite 解析` <script type=\"module" src="..."> `，这个标签指向你的 JavaScript 源码。甚至内联引入 JavaScript 的 `<script type="module"> `和引用 CSS 的 `<link href> `也能利用 Vite 特有的功能被解析。另外，index.html 中的 URL 将被自动转换，因此不再需要 %PUBLIC_URL% 占位符了。
 
-谈到堆栈，我们需要先来了解一下关于 `js` 的两种数据类型。
+与静态 HTTP 服务器类似，Vite 也有 “根目录” 的概念，即服务文件的位置，在接下来的文档中你将看到它会以 `<root>` 代称。源码中的绝对 URL 路径将以项目的 “根” 作为基础来解析，因此你可以像在普通的静态文件服务器上一样编写代码（并且功能更强大！）。Vite 还能够处理依赖关系，解析处于根目录外的文件位置，这使得它即使在基于 monorepo 的方案中也十分有用。
 
-### （1）js 数据类型的分类
+## vite全局变量
 
-首先，JavaScript 中的数据类型分为**基本数据类型**和**引用数据类型**。
+### .env文件
+`.env`文件是一个用于存储环境变量的文件。在开发和部署应用程序时，经常需要在不同的环境中配置不同的变量，例如 API 地址、数据库连接信息、密钥等。在许多应用程序中，`.env `文件通常包含一个或多个键值对，用于存储环境变量。
 
-了解完分类以后，相信很多小伙伴心里有一个疑惑：这两个数据类型是什么呢？且在内存中是存放在哪里呢？
-
-### （2）js 数据类型的定义和存储方式
-
-**基本数据类型：**
-
-基本数据类型，是指 `Numer` 、 `Boolean` 、 `String` 、 `null` 、 `undefined` 、 `Symbol（ES6新增的）` 、 `BigInt（ES2020）` 等值，它们在内存中都是存储在 **栈** 中的，即直接访问该变量就可以得到存储在 **栈** 中的对应该变量的值。
-
-若将一个变量的值赋值给另一个变量，则这两个变量在内存中是独立的，修改其中任意一个变量的值，不会影响另一个变量。这就是基本数据类型。
-
-**引用数据类型：**
-
-那引用数据类型呢，是指 `Object` 、 `Array` 、 `Function` 等值，他们在内存中是存在于 **栈和堆** 当中的，即我们要访问到引用类型的值时，需要先访问到该变量在 **栈** 中的地址（这个地址指向堆中的值），然后再通过这个地址，访问到存放在 **堆** 中的数据。这就是引用数据类型。
-
-这样说可能有点抽象，让我们用一张图来理解一下。
-
-![基本数据类型和引用数据类型](https://mondaylab-1309616765.cos.ap-shanghai.myqcloud.com/images/202304151115989.png)
-
-从上图中可以看到， `name` 和 `age` 的值都是基本数据类型，所以他们指向程序中 **栈** 的位置。而 `like` 是数组类型，也就是引用数据类型，所以在 **栈** 中，它先存放了一个 `like` 的地址，之后再把 `like` 对应的值，存放到 **堆** 当中。
-
-了解完数据类型和其存储方式后，在面试中，还有可能被问到如何判断某一个数据的类型是什么？什么意思呢？比如说，给你一个数字 `7` ，需要你来判断它是什么，我们都知道它是 Number 类型，但很多时候止步于如何做才能判断它是一个 Number 类型。接下来将详细介绍三种判断数据类型的方法。
-
-### （3）js 数据类型的判断方式
-
-常用判断方式：typeof、instanceof、===
-
-**1）typeof：**
-
-**定义**：返回数据类型的字符串表达（小写）
-
-**用法**：typeof + 变量
-
-**可以判断**：
-
-- `undefined` / 数值 / 字符串 / 布尔值 / `function` （ 返回 `undefined` / `number` / `string` / `boolean` / `function` ）
-- `null` 、 `object` 与 `array` （null、array、object 都会返回 `object` ）
-
-**以下给出代码演示：**
-
+在项目根目录下常见.env文件：
+```text
+.env                # 所有情况下都会加载
+.env.[mode]         # 只在指定模式下加载
+```
+[mode]指定的是具体模式，所以，一般对于开发，生产和测试环境，都会指定具体的环境
+```text
+.env
+.env.development
+.env.production
+.env.test
+```
+示例：
 ```js
-<script type="text/javascript">
-    console.log(typeof "Tony");                // 返回 string
-    console.log(typeof 5.01);                  // 返回 number
-    console.log(typeof false);                 // 返回 boolean
-    console.log(typeof undefined);             // 返回 undefined
-    console.log(typeof null);                  // 返回 object
-    console.log(typeof [1,2,3,4]);             // 返回 object
-    console.log(typeof {name:'John', age:34}); // 返回 object
-</script>
+# 只在开发环境加载
+VITE_USER_NODE_ENV = development
+
+# 打包时是否删除 console
+VITE_DROP_CONSOLE = true
+
+# 公共基础路径
+VITE_PUBLIC_PATH = /
+
+# 开发环境接口地址
+VITE_API_URL = /api
 ```
 
-**2）instanceof：**
+### 环境切换
+默认的npm run dev和npm run build就分别对应development开发环境和production生成环境。
 
-**定义**：判断对象的具体类型
-
-**用法**：b instanceof A → b 是否是 A 的实例对象
-
-**可以判断**：
-
-- 专门用来判断对象数据的类型: `Object` , `Array` 与 `Function`
-
-- 判断 `String` ，`Number` ，`Boolean` 这三种类型的数据时，直接赋值为 `false` ，调用**构造函数**创建的数据为 `true`
-
-**以下给出代码演示：**
-
-```js
-<script type='text/javascript'>
-  let str = new String("hello world") //console.log(str instanceof String); →
-  true str = "hello world" //console.log(str instanceof String); → false let num
-  = new Number(44) //console.log(num instanceof Number); → true num = 44
-  //console.log(num instanceof Number); → false let bool = new Boolean(true)
-  //console.log(bool instanceof Boolean); → true bool = true //console.log(bool
-  instanceof Boolean); → false
-</script>
-```
-
-```js
-<script type="text/javascript">
-    let items = [];
-    let object = {};
-
-    function reflect(value) {
-        return value;
-    }
-
-    console.log(items instanceof Array);        // true
-    console.log(items instanceof Object);       // true
-    console.log(object instanceof Object);      // true
-    console.log(object instanceof Array);       // false
-    console.log(reflect instanceof Function);   // true
-    console.log(reflect instanceof Object);     // true
-</script>
-```
-
-**3）===：**
-
-**可以判断**：undefined，null
-
-**以下给出代码演示：**
-
-```js
-<script type='text/javascript'>
-  let str; console.log(typeof str, str === undefined); //'undefined', true let
-  str2 = null; console.log(typeof str2, str2 === null); // 'object', true
-</script>
-```
-
-讲到这里，我们了解了 js 的两种数据类型，以及两种数据类型相关的存储方式和判断方式。那么，接下来将讲解他们在前端中常见的应用，深拷贝和浅拷贝。
-
-## 2、深究浅拷贝和深拷贝
-
-### （1）浅拷贝
-
-**1）定义**
-
-所谓浅拷贝，就是一个变量赋值给另一个变量，其中一个变量的值改变，则两个变量的值都变了，即对于浅拷贝来说，是数据在拷贝后，新拷贝的对象内部 **仍然有一部分数据** 会随着源对象的变化而变化。
-
-**2）代码演示**
-
-```js
-// 浅拷贝-分析
-function shallowCopy(obj) {
-  let copyObj = {};
-  for (let i in obj) {
-    copyObj[i] = obj[i];
-  }
-  return copyObj;
+也可以手动配置：
+```json
+"scripts": {
+    "dev": "vite",
+    "build": "vue-tsc && vite build",
+    "build:dev": "vue-tsc && vite build --mode development",
+    "build:test": "vue-tsc && vite build --mode test",
+    //....
 }
+```
+加上--mode就能对环境进行设定。
 
-// 浅拷贝-实例
-let a = {
-  name: '张三',
-  age: 19,
-  like: ['打篮球', '唱歌', '跳舞'],
-};
+### 引用全局环境变量
+在vite项目中读取.env文件内容非常简单，使用`import.meta.env`,就可读取当前环境中加载的.env文件的内容。
 
-//将a拷贝给b
-let b = shallowCopy(a);
-
-a.name = '李四';
-a.like[0] = '打乒乓球';
-console.log(a);
-/*
-*{
-    name: '李四',
-    age: 19,
-    like: ['打乒乓球', '唱歌', '跳舞']
-	}
-*/
-console.log(b);
-/*
-*{
-    name: '张三',
-    age: 19,
-    like: ['打乒乓球', '唱歌', '跳舞']
-	}
-*/
+例如：
+```js
+const BASE_API = import.meta.env.VITE_APP_BASE_API
 ```
 
-**3）图例**
+但是，在关键的配置文件`vite.config.ts`中import.meta.env是使用不了的，返回undefined。因为vite.config.ts 文件是在` Vite 服务运行之前`被 TypeScript 编译器编译的，而 import.meta.env 变量是在 Vite 服务运行时由 Vite 自动注入到代码中的。
 
-从上面中的代码可以看到，我们明明把 `a` 对象拷贝给 `b` 了，但是 `b` 最终打印出来的结果部分数据不变，部分数据却变了。这个时候很多小伙伴就很疑惑了，这究竟是为什么呢？
+为此，vite专门提供了`loadEnv()`函数，帮我们读取当前环境中env文件的内容。为此，我们可以将默认生成的vite.config.ts文件中的内容进行修改。
+```ts
+import { defineConfig, loadEnv } from "vite";
+import vue from "@vitejs/plugin-vue";
 
-我们回顾上面所说到的关于 **引用数据类型** 的知识点，上述代码中的 `b` 中的 `like` ，是一个数组，也就是引用数据类型。我们都知道，引用数据类型的数据是存放于 **栈和堆** 当中的，所以上述中的 `like` 数组，我们将它视为一个地址，这个地址存放于 **栈** 当中，同时，这个地址里面的数据，就指向于 **堆** 当中。我们来看一下图例。
+// https://vitejs.dev/config/
+export default defineConfig(({ mode, command, ssrBuild }) => {
+  const root = process.cwd();
+  const env = loadEnv(mode, root);
+  console.log(env);
+  return {
+    plugins: [vue()],
+  }
+});
+```
+`process.cwd()`获得当前项目路径，`const env = loadEnv(mode, root)`得到的就是当前环境的env对象。
+## vite静态资源
+在vite创建的vue3项目中，引用图片资源有以下两种方式：
+### 模板中直接引用图片
+```html
+<a href="https://vuejs.org/" target="_blank">
+  <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
+</a>
+```
+### css或者js中引用图片
 
-![浅拷贝](https://mondaylab-1309616765.cos.ap-shanghai.myqcloud.com/images/202304151116833.png)
-
-从上图中可以看到，当对 `a` 中 `like` 的数据进行改变时，它对应的数据在 **堆** 中改变。而 `b` 拷贝后的 `like` 地址所指向的数据，也是跟 `a` 一样在 **堆** 中的位置。也就是说，`a` 和 `b` 中的 `like` 地址，它们的数据指向 **堆** 中的同一个位置，所以 `b` 在拷贝完数据以后，部分数据会随着 `a` 的变化而变化。这就是浅拷贝。
-
-讲完浅拷贝，接下来来了解深拷贝。
-
-### （2）深拷贝
-
-**1）定义**：深拷贝就是，新拷贝的对象内部所有数据都是 **独立存在** 的，不会随着源对象的改变而改变。
-
-**2）深拷贝有两种方式**：递归拷贝和利用 `JSON` 函数进行深拷贝。
-
-- **递归拷贝的实现原理是**：对变量中的每个元素进行获取，若遇到基本类型值，直接获取；若遇到引用类型值，则继续对该值内部的每个元素进行获取。
-- **JSON 深拷贝的实现原理是**：将变量的值转为字符串形式，然后再转化为对象赋值给新的变量。
-
-**3）局限性**：深拷贝的局限性在于，会忽略 undefined，不能序列化函数，不能解决循环引用的对象。
-
-**4）代码演示**
-
+在js中引入，有时候我们模板中的图片地址是一个变量：
 ```js
-// 深拷贝-递归函数方法分析
-function deepCopy(obj) {
-  // 判断是否为引用数据类型
-  if (typeof obj === 'object') {
-    let result = obj.constructor === Array ? [] : {};
+import imgUrl from './img.png'
+document.getElementById('hero-img').src = imgUrl
+```
+例如，imgUrl 在开发时会是 /img.png，在生产构建后会是 /assets/img.2d8efhg.png。
 
-    for (let i in obj) {
-      result[i] = typeof obj[i] === 'object' ? deepCopy(obj[i]) : obj[i];
-    }
+行为类似于 Webpack 的 file-loader。区别在于导入既可以使用绝对公共路径（基于开发期间的项目根路径），也可以使用相对路径。
 
-    return result;
-  }
-  // 为基本数据类型，直接赋值返回
-  else {
-    return obj;
-  }
+1. url() 在 CSS 中的引用也以同样的方式处理。
+
+2. 如果 Vite 使用了 Vue 插件，Vue SFC 模板中的资源引用都将自动转换为导入。
+
+3. 常见的图像、媒体和字体文件类型被自动检测为资源。你可以使用 assetsInclude 选项 扩展内部列表。
+
+4. 引用的资源作为构建资源图的一部分包括在内，将生成散列文件名，并可以由插件进行处理以进行优化。
+
+5. 较小的资源体积小于 assetsInlineLimit 选项值 则会被内联为 base64 data URL。
+
+6. Git LFS 占位符会自动排除在内联之外，因为它们不包含它们所表示的文件的内容。要获得内联，请确保在构建之前通过 Git LFS 下载文件内容。
+
+7. 默认情况下，TypeScript 不会将静态资源导入视为有效的模块。要解决这个问题，需要添加 vite/client。
+添加声明d.ts文件：
+```js
+/// <reference types="vite/client" />
+```
+或者使用`new URL(url, import.meta.url)`
+`import.meta.url` 是一个 ESM 的原生功能，会暴露当前模块的 URL。将它与原生的 URL 构造器 组合使用，在一个 JavaScript 模块中，通过相对路径我们就能得到一个被完整解析的静态资源 URL：
+```js
+const imgUrl = new URL('./img.png', import.meta.url).href
+
+document.getElementById('hero-img').src = imgUrl
+```
+通用的图片引入函数：
+```js
+function getImageUrl(name) {
+  return new URL(`./dir/${name}.png`, import.meta.url).href
 }
-
-// 深拷贝-递归函数方法实例
-let c = {
-  name: '张三',
-  age: 12,
-  like: ['打篮球', '打羽毛球', '打太极'],
-};
-
-let d = deepCopy(c);
-
-c.name = '李四';
-c.like[0] = '打乒乓球';
-console.log(c);
-/*
-*{
-    name: '李四',
-    age: 19,
-    like: ['打乒乓球', '打羽毛球', '打太极']
-	}
-*/
-console.log(d);
-/*
-*{
-    name: '张三',
-    age: 19,
-    like: ['打篮球', '打羽毛球', '打太极']
-	}
-*/
 ```
-
+在生产构建时，Vite 才会进行必要的转换保证 URL 在打包和资源哈希后仍指向正确的地址。然而，`这个 URL 字符串必须是静态的`，这样才好分析。否则代码将被原样保留、因而在 build.target 不支持 import.meta.url 时会导致运行时错误。
 ```js
-// 深拷贝-JSON函数方法实例
-let c = {
-  name: '张三',
-  age: 19,
-  like: ['打篮球', '唱歌', '跳舞'],
-};
-
-let d = JSON.parse(JSON.stringify(c));
-
-// 注意： JSON函数做深度拷贝时不能拷贝正则表达式，Date，方法函数等
-
-c.name = '李四';
-c.like[0] = '打乒乓球';
-
-console.log(c);
-/*
-*{
-    name: '李四',
-    age: 19,
-    like: ['打乒乓球', '唱歌', '跳舞']
-	}
-*/
-console.log(d);
-/*
-*{
-    name: '张三',
-    age: 19,
-    like: ['打篮球', '唱歌', '跳舞']
-	}
-*/
+// Vite 不会转换这个
+const imgUrl = new URL(imagePath, import.meta.url).href
 ```
-
-从上述代码中可以看到，深拷贝后的数据各自都是独立存在的，不会随着源对象的变化而变化，这就是深拷贝。不过值得注意的是，在我们平常的开发中，用的更多的是递归函数来进行深拷贝，原因在于递归函数方法的灵活性会更强一点。而 `JSON` 函数方法有很多局限性，在做深度拷贝时不能拷贝正则表达式、Date、方法函数等。
-
-# 四、前端与栈：函数调用堆栈
-
-在我们平常的开发中，经常会写很多函数，那函数在执行过程中，其实就是一个调用堆栈。接下来我们用一段代码来演示。
-
+css中直接使用url()或者v-bind即可：
+```css
+.test-box {
+  background-image: url('/image/bg.png')
+}
+```
+### 引用后缀
+显示URL引入：
 ```js
-const func1 = () => {
-  func2();
-  console.log(3);
-};
-
-const func2 = () => {
-  func3();
-  console.log(4);
-};
-
-const func3 = () => {
-  console.log(5);
-};
-
-func1(); //5 4 3
+import workletURL from 'extra-scalloped-border/worklet.js?url'
+CSS.paintWorklet.addModule(workletURL)
 ```
 
-看到这里，很多小伙伴心中可能已经在构思整段代码的执行顺序是什么样的。接下来用一张图来展示。
+以字符串引入：
+```js
+import shaderString from './shader.glsl?raw'
+```
 
-![函数调用堆栈](https://mondaylab-1309616765.cos.ap-shanghai.myqcloud.com/images/202304151116886.png)
+以脚本引入：
+脚本可以通过 ?worker 或 ?sharedworker 后缀导入为 web worker。
+```js
+// 在生产构建中将会分离出 chunk
+import Worker from './shader.js?worker'
+const worker = new Worker()
 
-我们都知道， `JavaScript` 的执行环境是**单线程**的。所谓单线程是指一次只能完成一个任务，如果有多个任务，就必须排队，只有当前面一个任务完成时，才能执行后面一个任务，以此类推。上图中所演示的，即每调用一个函数，如果里面还有新的函数，那么就先把它放到调用堆栈里，等到所有任务都放满以后，开始依次执行。
+```
+```js
+// sharedworker
+import SharedWorker from './shader.js?sharedworker'
+const sharedWorker = new SharedWorker()
 
-而函数调用堆栈是一个典型的栈的数据结构，遵循后进先出原则，当 `func1` ， `func2` ， `func3` 依次放进调用栈后， **遵循后进先出原则** ，那么 `func3` 函数的内容会先被执行，之后是 `func2` ，最后是 `func1` 。这就是函数调用堆栈。
+```
+```js
+// 内联为 base64 字符串
+import InlineWorker from './shader.js?worker&inline'
 
-# 五、写在最后
+```
 
-栈在前端中的应用就讲到这里啦！栈在我们平常的开发中无处不在，我们写的每一个程序，基本上都会用到函数调用堆栈。且在前端的面试中，面试官也很喜欢问深拷贝和浅拷贝，大家可以对这块知识多回顾多实践。
+## 待补充……

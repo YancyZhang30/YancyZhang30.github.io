@@ -4,6 +4,7 @@ import {
   toolSidebarDetail,
   linuxSidebarDetail,
   nginxSidebarDetail,
+  nodeSidebarDetail,
 } from './sidebarList'
 
 export const sidebar: DefaultTheme.Sidebar = {
@@ -11,4 +12,5 @@ export const sidebar: DefaultTheme.Sidebar = {
   ...toolSidebarDetail,
   ...linuxSidebarDetail,
   ...nginxSidebarDetail,
+  ...nodeSidebarDetail,
 }

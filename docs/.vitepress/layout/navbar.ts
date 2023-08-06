@@ -29,6 +29,10 @@ export const nav: DefaultTheme.NavItem[] = [
         text: 'Nginx',
         link: '/views/nginx/'
       },
+      {
+        text: 'NodeJs',
+        link: '/views/node/'
+      },
     ]
   },
   {

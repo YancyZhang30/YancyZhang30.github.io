@@ -6,6 +6,10 @@ export const linuxSidebarDetail = {
         {
           text: 'Linux入门',
           link: '/views/linux/01_startLinux.md'
+        },
+        {
+          text: 'vim',
+          link: '/views/linux/02_vim.md'
         }
       ]
     }
