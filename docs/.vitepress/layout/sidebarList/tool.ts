@@ -14,6 +14,10 @@ export const toolSidebarDetail = {
           text: 'Day.js',
           link: '/views/tool/02_Day.js'
         },
+        {
+          text: 'Git',
+          link: '/views/tool/03_Git'
+        },
       ]
     },
   ],
