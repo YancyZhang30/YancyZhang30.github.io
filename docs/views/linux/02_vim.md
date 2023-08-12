@@ -77,5 +77,3 @@ Vim 是从 vi 发展出来的一个文本编辑器。代码补全、编译及错
 ![vim 三模式切换](https://www.runoob.com/wp-content/uploads/2014/07/vim-vi-workmodel.png)
 
 ## 高级用法
-
-//TODO

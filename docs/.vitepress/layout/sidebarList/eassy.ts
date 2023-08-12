@@ -18,6 +18,10 @@ export const eassySidebarDetail = {
           text: 'Vue样式模块化与样式穿透',
           link: '/views/essay/03_Vue样式模块化与样式穿透'
         },
+        {
+          text: 'KeepAlive组件',
+          link: '/views/essay/04_keep-alive'
+        }
       ]
     },
   ],

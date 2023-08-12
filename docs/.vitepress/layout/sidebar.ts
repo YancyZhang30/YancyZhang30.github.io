@@ -5,6 +5,7 @@ import {
   linuxSidebarDetail,
   nginxSidebarDetail,
   nodeSidebarDetail,
+  algorithmSidebarDetail,
 } from './sidebarList'
 
 export const sidebar: DefaultTheme.Sidebar = {
@@ -13,4 +14,5 @@ export const sidebar: DefaultTheme.Sidebar = {
   ...linuxSidebarDetail,
   ...nginxSidebarDetail,
   ...nodeSidebarDetail,
+  ...algorithmSidebarDetail,
 }
