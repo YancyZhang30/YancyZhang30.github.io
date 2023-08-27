@@ -36,6 +36,10 @@ export const nav: DefaultTheme.NavItem[] = [
       {
         text: '数据结构与算法',
         link: '/views/algorithm/'
+      },
+      {
+        text: 'python学习',
+        link: '/views/python/'
       }
     ]
   },

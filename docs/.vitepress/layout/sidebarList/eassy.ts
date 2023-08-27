@@ -21,6 +21,10 @@ export const eassySidebarDetail = {
         {
           text: 'KeepAlive组件',
           link: '/views/essay/04_keep-alive'
+        },
+        {
+          text: 'shell，cmd，dos，脚本语言之间的关系',
+          link: '/views/essay/05_shell'
         }
       ]
     },
