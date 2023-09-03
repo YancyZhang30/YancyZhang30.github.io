@@ -25,6 +25,18 @@ export const eassySidebarDetail = {
         {
           text: 'shell，cmd，dos，脚本语言之间的关系',
           link: '/views/essay/05_shell'
+        },
+        {
+          text: '前端脚手架开发',
+          link: '/views/essay/06_cli'
+        },
+        {
+          text: 'package-lock.json',
+          link: '/views/essay/07_package-lock'
+        },
+        {
+          text: '前端项目调试',
+          link: '/views/essay/08_DeBug'
         }
       ]
     },
