@@ -18,6 +18,13 @@
 - 编辑样式
 - 编辑 DOM
 [![elements](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/1/7/168274461fd902c3~tplv-t2oaga2asx-jj-mark:1890:0:0:0:q75.awebp)](https://p1-jj.byteimg.com/tos-cn-i-t2oaga2asx/gold-user-assets/2019/1/7/168274461fd902c3~tplv-t2oaga2asx-jj-mark:1890:0:0:0:q75.awebp)
+### 通过'h'隐藏元素
+按一下 'h' 就可以隐藏你在元素面板中选择的元素。再次按下 'h' 可以使它出现。某些的时候这很有用：例如你想截图，但你想去掉里面的敏感信息。
+### 拖拽、移动元素
+### 基础编辑器的操作
+从某一点来看，我们可以拖动，放置，编辑，复制(当然，以及使用 [ctrl] + [v] 来粘贴)， 所以我们可以在元素面板里把 HTML 结构搞得一团糟。在任意一个编辑器中都有一个标准，那么如何撤回你的操作呢？
+
+使用[ctrl] + [z] ([⌘] + [z] on Mac)撤销我们的任何改动。 使用 [ctrl] + [shift] + [z]重新编辑我们的任何修改。
 
 ## 2、控制台面板（Console）
 在开发期间，可以使用控制台面板记录诊断信息，或者使用它作为 shell 在页面上与 JavaScript 交互。
