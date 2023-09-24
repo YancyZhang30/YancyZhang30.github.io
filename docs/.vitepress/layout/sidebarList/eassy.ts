@@ -37,6 +37,10 @@ export const eassySidebarDetail = {
         {
           text: '前端项目调试',
           link: '/views/essay/08_debug'
+        },
+        {
+          text: 'JavaScript模块化',
+          link: '/views/essay/09_module'
         }
       ]
     },

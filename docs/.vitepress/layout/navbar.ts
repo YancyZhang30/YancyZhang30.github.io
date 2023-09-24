@@ -15,6 +15,10 @@ export const nav: DefaultTheme.NavItem[] = [
       {
         text: '工具·库',
         link: '/views/tool/'
+      },
+      {
+        text: '计算机网络',
+        link: '/views/network/'
       }
     ]
   },
@@ -40,6 +44,14 @@ export const nav: DefaultTheme.NavItem[] = [
       {
         text: 'python学习',
         link: '/views/python/'
+      },
+      {
+        text: 'MongoDB学习',
+        link: '/views/mongodb/'
+      },
+      {
+        text: 'Docker',
+        link: '/views/docker/'
       }
     ]
   },
