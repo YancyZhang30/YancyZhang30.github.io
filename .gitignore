@@ -75,3 +75,5 @@ docs/.vitepress/cache
 
 # FuseBox cache
 .fusebox/
+
+dist
