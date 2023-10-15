@@ -268,7 +268,7 @@ https://zhuanlan.zhihu.com/p/624322044
 
 有时我们会使用一些java或node应用，但又不想让他们直接监听80端口，这时就需要用到端口转发，这也是最常用的反向代理场景。
 
-```text
+```txt
 server{
   listen 80;
   server_name  localhost;
@@ -323,7 +323,7 @@ server {
 
 正向代理是一个位于客户端和原始服务器之间的服务器，为了从原始服务器取得内容，客户端向代理发送一个请求并指定目标，然后代理向原始服务器转交请求并将获得的内容返回给客户端。客户端必须要进行一些特别的设置才能使用正向代理。
 
-```text
+```txt
 server {
      listen 18088;
      resolver x.x.x.x valid=60s ipv6=off;
